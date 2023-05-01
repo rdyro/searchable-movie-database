@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Dynamic Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            text-align: left;
+            padding: 7px;
+        }
+
+        div {
+            text-align: center;
+        }
+    </style>
+    <script src="main.js"></script>
+</head>
+
+<body>
+    <h1>Search</h1>
+    <input type="text" id="searchField" placeholder="Enter keyword..." />
+    <input type="text" id="minYear" placeholder="Min Year..."   style="width: 90px" />
+    <input type="text" id="maxYear" placeholder="Max Year..."   style="width: 90px" />
+    <input type="text" id="minScore" placeholder="Min Score..." style="width: 90px" />
+    <input type="text" id="maxScore" placeholder="Max Score..." style="width: 90px" />
+
+    <button onclick="sendRequest()">Search</button>
+    <div id="results"></div>
+</body>
+
+</html>
