@@ -10,3 +10,11 @@ Execute
 $ python3 server.py
 ```
 to run.
+
+---
+
+### Screenshot
+
+<div align="center" >
+<img src="data/movie_search_screenshot.png" />
+</div>

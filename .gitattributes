@@ -46,3 +46,4 @@ data/index_comb/4d5cc64f88c64d09ad8215377c290aad.posidx filter=lfs diff=lfs merg
 data/index_comb/abb8aed4f0bf47dfb82ac847a5362f01.fieldnorm filter=lfs diff=lfs merge=lfs -text
 data/index_comb/abb8aed4f0bf47dfb82ac847a5362f01.idx filter=lfs diff=lfs merge=lfs -text
 data/index_comb/b2e5e4362a734c1ca7effde74d9b13ac.idx filter=lfs diff=lfs merge=lfs -text
+data/* filter=lfs diff=lfs merge=lfs -text
