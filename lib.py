@@ -2,17 +2,44 @@ import os
 from typing import List
 from shutil import rmtree
 from pathlib import Path
-import threading
+import requests
 import re
 from PIL import Image
 from io import BytesIO
 
 import tantivy
+import tmdbsimple as tmdb
 from tqdm import tqdm
-import numpy as np
 import pandas as pd
 
 from google_images_search import GoogleImagesSearch
+
+####################################################################################################
+
+tmdb.API_KEY = os.environ["TMDB_API_KEY"]
+
+def get_first_image_tmdb(query, year):
+    self = get_first_image_tmdb
+    if not hasattr(self, "img_base_url"):
+        base_url = "https://api.themoviedb.org/3"
+        self.img_base_url = requests.get(
+            f"{base_url}/configuration", params={"api_key": tmdb.API_KEY}
+        ).json()["images"]["secure_base_url"]
+    search = tmdb.Search()
+    search.movie(query=query, year=year)
+    assert len(search.results) > 0
+    first_result = search.results[0]
+    ret = requests.get(
+        f"{self.img_base_url}/w500/{first_result['poster_path']}", params={"api_key": tmdb.API_KEY}
+    )
+    img = Image.open(BytesIO(ret.content))
+    height = 500
+    img = img.resize((round(img.size[0] / img.size[1] * height), height), Image.ANTIALIAS)
+    return img
+
+
+####################################################################################################
+
 
 def get_first_image(query) -> Image:
     with GoogleImagesSearch(os.environ["GCS_DEVELOPER_KEY"], os.environ["GCS_CX"]) as gis:
@@ -21,6 +48,7 @@ def get_first_image(query) -> Image:
         height = 500
         img = img.resize((round(img.size[0] / img.size[1] * height), height), Image.ANTIALIAS)
     return img
+
 
 ####################################################################################################
 
@@ -47,10 +75,12 @@ rules = [
     "^\| TV-Y7",
 ]
 
+
 def remove_rating(s: str):
     for rule in rules:
         s = re.sub(rule, "", s).strip()
     return s
+
 
 def try_integer(x):
     try:
@@ -58,7 +88,9 @@ def try_integer(x):
     except:
         return -1
 
+
 ####################################################################################################
+
 
 class SearchDB:
     def __init__(self, df: pd.DataFrame, index_path: Path):
@@ -79,7 +111,9 @@ class SearchDB:
         self.index = tantivy.Index(self.schema, str(self.index_path))
 
     def build_index(self, rebuild: bool = False):
-        if not self.index_path.is_dir() or (rebuild and self.index_path.exists() and len(os.listdir(self.index_path)) > 1):
+        if not self.index_path.is_dir() or (
+            rebuild and self.index_path.exists() and len(os.listdir(self.index_path)) > 1
+        ):
             rmtree(str(self.index_path.absolute()), ignore_errors=True)
             self.create_index()
 
@@ -88,9 +122,7 @@ class SearchDB:
             return
         writer = self.index.writer()
         for i, row in tqdm(self.df.iterrows(), total=self.df.shape[0]):
-            writer.add_document(
-                tantivy.Document(**dict({k: v for (k, v) in row.items()}, index=i))
-            )
+            writer.add_document(tantivy.Document(**dict({k: v for (k, v) in row.items()}, index=i)))
         writer.commit()
         self.index.reload()
 

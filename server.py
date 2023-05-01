@@ -16,7 +16,7 @@ ROOT_DIR = Path(__file__).absolute().parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from lib import SearchDB, get_first_image
+from lib import SearchDB, get_first_image, get_first_image_tmdb
 
 ####################################################################################################
 
@@ -48,7 +48,8 @@ def get_img(title, year):
     key = f"\"{title}\" {year} movie poster"
     if key in poster_db:
         return b64encode(poster_db[key]).decode("utf-8")
-    img = get_first_image(key)
+    #img = get_first_image(key)
+    img = get_first_image_tmdb(title, year)
     buf = BytesIO()
     img.save(buf, format="JPEG")
     buf.seek(0)
