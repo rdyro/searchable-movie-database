@@ -16,7 +16,10 @@ from google_images_search import GoogleImagesSearch
 
 ####################################################################################################
 
-tmdb.API_KEY = os.environ["TMDB_API_KEY"]
+if "TMDB_API_KEY" in os.environ:
+    tmdb.API_KEY = os.environ["TMDB_API_KEY"]
+elif Path(__file__).parent / "data" / "api_key.txt":
+    tmdb.API_KEY = (Path(__file__).parent / "data" / "api_key.txt").read_text().strip()
 
 def get_first_image_tmdb(query, year):
     self = get_first_image_tmdb
